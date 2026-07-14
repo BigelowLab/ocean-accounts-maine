@@ -1,0 +1,17 @@
+Package: oame
+Type: Package
+Title: Ocean Accounts for Maine
+Version: 0.1.0
+Author: Ben Tupper
+Maintainer: Ben Tupper <btupper@bigelow.org>
+Description: R language utilities for working with Ocean Accounts data for Maine.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Depends: R (>= 4.1.0)
+Imports:
+  rlang,
+  dplyr,
+  readr,
+  yaml
+RoxygenNote: 7.3.2
+Roxygen: list(markdown = TRUE)
