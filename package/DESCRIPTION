@@ -11,6 +11,8 @@ Depends: R (>= 4.1.0)
 Imports:
   rlang,
   dplyr,
+  tidyr,
+  stringr,
   readr,
   yaml
 RoxygenNote: 7.3.2
