@@ -30,7 +30,16 @@ plot_monthly_timeseries = function(x = read_nao(),
 #' @rdname plot_monthly_timeseries
 plot_monthly_climatology = function(x = read_nao(),
                                     title = "NAO"){
-  x = dplyr::mutate(x, month = factor(.data$month, levels = month.abb))
+  epochs = function(x){
+    x = round(x/10) * 10
+    p = pretty(x)
+    cut(x, p, labels = p[seq_len(length(p)-1)])
+  }
+  
+  x = dplyr::mutate(na.omit(x), 
+                    month = factor(.data$month, levels = month.abb),
+                    epoch = epochs(.data$year))
+  n = length(levels(x$epoch))
   ggplot2::ggplot(data = x |>
                     dplyr::group_by(.data$month)) +
     ggplot2::geom_violin(
@@ -38,10 +47,10 @@ plot_monthly_climatology = function(x = read_nao(),
       draw_quantiles = c(0.25, 0.5, 0.75),
       quantile.linewidth = c(0.2, 1, 0.2)) +
     ggplot2::geom_point(
-      mapping = ggplot2::aes(x = month, y = value, color = year),
-      position = ggplot2::position_jitter(width = 0),
-      alpha = 0.3, 
-      size = 0.5) + 
+      mapping = ggplot2::aes(x = month, y = value, color = epoch),
+      position = ggplot2::position_jitter(width = 0.1),
+      alpha = 0.3) + 
+    ggplot2::scale_color_brewer(type = "qual", palette = "Dark2") + 
     ggplot2::labs(title = title,
                   x = "Month",
                   y = "Index")

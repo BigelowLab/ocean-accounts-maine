@@ -1,0 +1,67 @@
+---
+title: "oame"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Ocean Account - Maine data
+The [oame R package]() serves Maine-centric ocean accounts data.
+
+
+## Requirements
+
+  + [R v4.2+](https://www.r-project.org/)
+  + [rlang](https://CRAN.R-project.org/package=rlang)
+  + [ggplot2](https://CRAN.R-project.org/package=ggplot2)
+  + [dplyr](https://CRAN.R-project.org/package=dplyr)
+  + [tidyr](https://CRAN.R-project.org/package=tidyr)
+  + [readr](https://CRAN.R-project.org/package=readr)
+  + [yaml](https://CRAN.R-project.org/package=yaml)
+  
+
+## Installation
+
+```
+remotes::install_github("BigelowLab/ocean-accounts-maine/package")
+```
+
+## Reading data
+
+
+```{r nao}
+library(oame)
+library(dplyr)
+
+nao = read_nao() |> glimpse()
+```
+
+```{r amo}
+amo = read_amo() |> glimpse()
+```
+
+```{r landings}
+landings = read_dmr_landings("merged") |> glimpse()
+```
+
+
+## Plotting
+
+The NAO and AMO data are identical in structure, so they share three plotting schemes... but each has a wrapper of it's own: `plot_nao()` and `plot_amo()`
+
+```{r amo_timeseries}
+plot_amo(amo, type = "timeseries")
+```
+
+```{r amo_monthly}
+plot_amo(amo, type = "monthly")
+```
+
+```{r amo_climatology}
+plot_amo(amo, type = "climatology")
+```
+
+
+

@@ -54,3 +54,40 @@ read_amo = function(filename = oame_path("AMO", "amo.csv"),
   
   read_monthly_fwf(filename, form = form)
 }
+
+
+#' Read ME DMR landings data
+#' 
+#' @description
+#' [Maine's DMR landings data portal](https://mainedmr.shinyapps.io/Landings_Portal/) allows
+#' for the download of "historic" (state wide annual totals per species) and "modern"
+#' (per port per species annual totals) landings data.  Use this function to 
+#' read historic, modern or merged data.
+#'  
+#' @export
+#' @param when chr, one of "modern" (default), "historic" or "merged"
+#' @return data frame
+read_dmr_landings = function(when = c("modern", "historic", "merged")[3]){
+  
+  when = tolower(when[1])
+  
+  if (when[1] == "merged") {
+    x = read_dmr_landings("modern")
+    y = read_dmr_landings("historic") |>
+      dplyr::mutate(port = "ME",
+                    county = "ME",
+                    lob_zone = "ME",
+                    weight_type = NA_character_)
+    r = dplyr::bind_rows(x,y)
+  } else {
+    pat = switch(when[1],
+                 "modern" = "^.*_Modern_.*\\.csv$",
+                 "historic" = "^.*_Historic_.*\\.csv$",
+                 stop("when not known", when[1]))
+    filename = list.files(oame_path("DMR", "landings"),
+                          pattern = pat,
+                          full.names = TRUE)
+    r = readr::read_csv(filename, show_col_types = FALSE)
+  }
+  r
+}
