@@ -12,8 +12,8 @@ Imports:
   rlang,
   dplyr,
   tidyr,
-  stringr,
   readr,
+  ggplot2,
   yaml
 RoxygenNote: 7.3.2
 Roxygen: list(markdown = TRUE)
