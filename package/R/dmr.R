@@ -67,8 +67,8 @@ map_species_by_county = function(x = read_dmr_landings("modern"),
     dplyr::ungroup() |>
     dplyr::filter(.data$species %in% spp) 
   
-  if (inherits(year, "character")){
-    x = switch(tolower(year),
+  if (inherits(years, "character")){
+    x = switch(tolower(years),
                "recent" =  x |> 
                       dplyr::slice_max(.data$year) |>
                         aggregate_dmr_landings_county(),
@@ -79,7 +79,12 @@ map_species_by_county = function(x = read_dmr_landings("modern"),
     x = x |>
       dplyr::filter(.data$year %in% years) |>
       aggregate_dmr_landings_county(collapse = collapse)
-    
+    years = if(length(years) > 1) {
+      as.character(years) 
+    } else { 
+      r = range(years)
+      years = sprintf("%i - %i", r)
+    }
   }
   
   x = dplyr::left_join(counties, x, by = "county")
@@ -101,5 +106,7 @@ map_species_by_county = function(x = read_dmr_landings("modern"),
   }  
   
   gg + 
-    ggplot2::scale_fill_viridis_c(direction = 1)
+    ggplot2::scale_fill_viridis_c(direction = 1)  + 
+    ggplot2::labs(title = spp,
+                  subtitle = sprintf("year(s): %s", paste(years, collapse = " ")))
 }

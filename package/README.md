@@ -111,3 +111,15 @@ plot_amo(amo, type = "climatology")
 ```
 
 ![](README_files/figure-gfm/amo_climatology-1.png)<!-- -->
+
+``` r
+map_species_by_county()
+```
+
+![](README_files/figure-gfm/chloropleth-1.png)<!-- -->
+
+``` r
+map_species_by_county(spp = "Lobster American", style = "cartogram")
+```
+
+![](README_files/figure-gfm/cartogram-1.png)<!-- -->

@@ -64,4 +64,12 @@ plot_amo(amo, type = "climatology")
 ```
 
 
+```{r chloropleth}
+map_species_by_county()
+```
+
+```{r cartogram}
+map_species_by_county(spp = "Lobster American", style = "cartogram")
+```
+
 
