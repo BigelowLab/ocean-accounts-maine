@@ -12,7 +12,11 @@ table (not the case change from "COUNTY")
 @return sf MULTIPLOYGON table}
 \usage{
 read_me_counties(
+<<<<<<< HEAD
   filename = oame_path("ME", "Maine_County_Boundary_Polygons_Dissolved_Feature.gpkg"),
+=======
+  filename = oame_path("ME", "Maine_County_Boundary_Polygons_Dissolved_Feature.geojson"),
+>>>>>>> f9ba982616d4debf3d1a6d9669002c9c4423bdc3
   simplify = TRUE,
   crs = NULL
 )
