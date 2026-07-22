@@ -40,7 +40,7 @@ plot_monthly_climatology = function(x = read_nao(),
                     month = factor(.data$month, levels = month.abb),
                     epoch = epochs(.data$year))
   n = length(levels(x$epoch))
-  ggplot2::ggplot(data = x |>
+  gg = ggplot2::ggplot(data = x |>
                     dplyr::group_by(.data$month)) +
     ggplot2::geom_violin(
       mapping = ggplot2::aes(x = month, y = value),
@@ -54,7 +54,7 @@ plot_monthly_climatology = function(x = read_nao(),
     ggplot2::labs(title = title,
                   x = "Month",
                   y = "Index")
-  
+  return(gg)
 }
 
 #' @export

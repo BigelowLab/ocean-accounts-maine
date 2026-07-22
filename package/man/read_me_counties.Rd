@@ -2,14 +2,7 @@
 % Please edit documentation in R/io.R
 \name{read_me_counties}
 \alias{read_me_counties}
-\title{Read Maine county boundary files
-
-@export
-@param filename path specification for the file
-@param simplify logical, if TRUE simplify to just "county" from the complete
-table (not the case change from "COUNTY")
-@param crs NULL or a crs to transform the geometry
-@return sf MULTIPLOYGON table}
+\title{Read Maine county boundary files}
 \usage{
 read_me_counties(
   filename = oame_path("ME", "Maine_County_Boundary_Polygons_Dissolved_Feature.gpkg"),
@@ -17,13 +10,17 @@ read_me_counties(
   crs = NULL
 )
 }
+\arguments{
+\item{filename}{path specification for the file}
+
+\item{simplify}{logical, if TRUE simplify to just "county" from the complete
+table (not the case change from "COUNTY")}
+
+\item{crs}{NULL or a crs to transform the geometry}
+}
+\value{
+sf MULTIPLOYGON table
+}
 \description{
 Read Maine county boundary files
-
-@export
-@param filename path specification for the file
-@param simplify logical, if TRUE simplify to just "county" from the complete
-table (not the case change from "COUNTY")
-@param crs NULL or a crs to transform the geometry
-@return sf MULTIPLOYGON table
 }
