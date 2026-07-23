@@ -127,62 +127,29 @@ map_species_by_county = function(x = read_dmr_landings("modern"),
 }
 
 
-#' Make a chloropleth map by county for one or more species and 
-#' and one or more years.
-#' 
-#' @export
-#' @param x table of DMR landings
-#' @param spp chr, one or more species
-#' @param years chr or num, "recent" for the most recent year for the species,
-#'   or specify your own year.  If you specify multiple years the data is 
-#'   aggregated.
-#' @param varname chr the name of the variable to map
-#' @param counties sf table with "county" attribute and in 3857 CRS
-#' @param style chr, one of "plain" or "cartogram"
-#' @return map plot object
-plotly_species_by_county = function(x = read_dmr_landings("modern"),
-                                 spp = "Clam Soft",
-                                 years = "recent",
-                                 varname = "trip_n",
-                                 counties = read_me_counties(crs = 3857),
-                                 style = c("plain", "cartogram")[1]){
+
+plot_dmr_county = function(x = "year", 
+                           y = "trip_n",
+                           spp = "Clam Soft",
+                           data = read_dmr_landings("modern")){
+  
   if (FALSE){
-    x = read_dmr_landings("modern")
+    x = "year"
+    y = "trip_n"
     spp = "Clam Soft"
-    years = "recent"
-    counties = read_me_counties(crs = 3857)
-    varname = "trip_n"
-    style = "plain"
+    data = read_dmr_landings("modern")
   }
-  x = prep_dmr_landings_county(x) |>
-    dplyr::ungroup() |>
-    dplyr::filter(.data$species %in% spp) 
   
-  if (inherits(years, "character")){
-    x = switch(tolower(years),
-               "recent" =  x |> 
-                 dplyr::slice_max(.data$year) |>
-                 aggregate_dmr_landings_county(),
-               "all" = aggregate_dmr_landings_county(x, collapse = "year"),
-               stop("year not known: ", year) )
+  data = prep_dmr_landings_county(data)|>
+    dplyr::filter(.data$species %in% spp)
+  if (length(spp) > 1) {
+    data = data |>
+             aggregate_dmr_landings_county(collapse = "species")
   } else {
-    collapse = if(length(years) > 1) "year" else "none"
-    x = x |>
-      dplyr::filter(.data$year %in% years) |>
-      aggregate_dmr_landings_county(collapse = collapse)
-    years = if(length(years) > 1) {
-      as.character(years) 
-    } else { 
-      r = range(years)
-      years = paste(r[1], r[2], sep = " - ")
-    }
+    data = data |>
+      aggregate_dmr_landings_county()
   }
   
-  x = dplyr::left_join(counties, x, by = "county")
   
-  plotly::plot_geo(data = counties) |>
-    add_sf(data = x, )
-    
   
 }
-  

@@ -12,6 +12,7 @@ DMR = oame::read_dmr_landings("modern") |>
   oame::prep_dmr_landings_county()
 AMO = oame::read_amo()
 NAO = oame::read_nao()
+TIDE = oame::read_tide()
 COUNTIES = oame::read_me_counties(crs = 3857)
 
 
@@ -22,10 +23,10 @@ ui <- shiny::fluidPage(
   bigelow_main_body(
   
     bslib::navset_tab(
-      nav_panel("AMO/NAO", 
+      nav_panel("Climatology", 
                 selectInput("Index",
                             "Choose an index to plot",
-                            choices= c("AMO", "NAO"),
+                            choices= c("AMO", "NAO", "Tides"),
                             selected= "AMO"),
                 selectInput("indexType",
                             "Choose a plot style",
@@ -33,13 +34,13 @@ ui <- shiny::fluidPage(
                             selected = "timeseries"),
                 div(style = "height: 70vh; overflow-x: auto; display: flex;",
                     div(style = "width: 68vh; flex-shrink: 0; margin: 1vh;", 
-                        bigelowshinytheme::bigelow_card(headerContent = "Oscillator Index",
+                        bigelowshinytheme::bigelow_card(headerContent = "Climatology",
                                                         plotOutput("indexPlot", width = "100%", height = "100%")))
                   )),
       nav_panel("DMR Landings Map", 
                 selectInput("dmrMapSpecies",
                             "Choose species",
-                            choices = DMR$species |> unique(),
+                            choices = DMR$species |> unique() |> sort(),
                             selected = "Clam Soft"),
                 selectInput("dmrMapVariable",
                             "Choose a variable",
@@ -65,11 +66,13 @@ ui <- shiny::fluidPage(
     ), #navset_bar
   ), #main body
   # Footer with bigelow logo
-  bigelowshinytheme::bigelow_footer("Tandy Center for Ocean Forecasting")
+  bigelowshinytheme::bigelow_footer("Tandy Center for Ocean Forecasting and National Ocean Economics Program")
 ) # fluidPage
 
 server <- function(input, output, session) {
-  
+  ###
+  #  index plot
+  ###
   index_name = reactive({
     input$Index
   })
@@ -84,9 +87,13 @@ server <- function(input, output, session) {
     
     switch(tolower(index[1]),
            "nao" = suppressWarnings(oame::plot_nao(NAO, type = type)),
-           "amo" = suppressWarnings(oame::plot_amo(AMO, type = type)) )
+           "amo" = suppressWarnings(oame::plot_amo(AMO, type = type)),
+           "tides" = oame::plot_tide(TIDE, type = type))
   })
   
+  ###
+  #  dmrMap
+  ###
   dmrMap_years = reactive({
     input$dmrMapYear
   }) 

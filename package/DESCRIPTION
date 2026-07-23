@@ -16,7 +16,6 @@ Imports:
   ggplot2,
   yaml,
   sf,
-  cartogram,
-  plotly
+  cartogram
 RoxygenNote: 7.3.2
 Roxygen: list(markdown = TRUE)
