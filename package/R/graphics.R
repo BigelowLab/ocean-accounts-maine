@@ -30,30 +30,32 @@ plot_monthly_timeseries = function(x = read_nao(),
 #' @rdname plot_monthly_timeseries
 plot_monthly_climatology = function(x = read_nao(),
                                     title = "NAO"){
-  epochs = function(x){
-    x = round(x/10) * 10
-    p = pretty(x)
-    cut(x, p, labels = p[seq_len(length(p)-1)])
-  }
-  
+
+  lut = 1:12 |>
+    rlang::set_names(month.abb)
+  xlabels = function(x){month.abb[x]}
   x = dplyr::mutate(na.omit(x), 
-                    month = factor(.data$month, levels = month.abb),
-                    epoch = epochs(.data$year))
-  n = length(levels(x$epoch))
+                    imonth = lut[.data$month])
+  recent_year = max(x$year)
+  y = dplyr::filter(x, .data$year == recent_year)
   gg = ggplot2::ggplot(data = x |>
-                    dplyr::group_by(.data$month)) +
-    ggplot2::geom_violin(
-      mapping = ggplot2::aes(x = month, y = value),
-      draw_quantiles = c(0.25, 0.5, 0.75),
-      quantile.linewidth = c(0.2, 1, 0.2)) +
-    ggplot2::geom_point(
-      mapping = ggplot2::aes(x = month, y = value, color = epoch),
-      position = ggplot2::position_jitter(width = 0.1),
-      alpha = 0.3) + 
-    ggplot2::scale_color_brewer(type = "qual", palette = "Dark2") + 
+                         dplyr::group_by(.data$year),
+                        mapping = ggplot2::aes(x = .data$imonth, 
+                                               y = .data$value, 
+                                               group = .data$year,
+                                               color = .data$year)) +
+    ggplot2::geom_path( ) +
+    ggplot2::scale_color_viridis_c(direction = 1, alpha = 0.7, option = "viridis") + 
+    ggplot2::scale_x_continuous(breaks = 1:12,
+                                labels = xlabels) + 
+    ggplot2::geom_path(data = y,
+                       mapping = ggplot2::aes(x = .data$imonth, 
+                                              y = .data$value),
+                       col = "blue", linewidth = 2) + 
     ggplot2::labs(title = title,
                   x = "Month",
-                  y = "Index")
+                  y = "Index",
+                  )
   return(gg)
 }
 

@@ -44,6 +44,9 @@ read_nao = function(filename = oame_path("NAO", "nao.csv"),
   read_monthly_fwf(filename, form = form)
 }
 
+
+
+
 #' Read AMO data
 #' 
 #' @rdname read_monthly_fwf
@@ -113,3 +116,4 @@ read_me_counties = function(filename = oame_path("ME", "Maine_County_Boundary_Po
   if (!is.null(crs)) x = sf::st_transform(x, crs)
   x
 }
+

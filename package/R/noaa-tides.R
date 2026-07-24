@@ -12,30 +12,6 @@ tide_stations = function(
     url = file.path(root, sprintf("%0.4i_meantrend.csv", id)) )
 }
 
-#' Fetch tide data
-#' 
-#' @export
-#' @param x data frame of tide stations
-#' @param path chr, the root data path
-#' @return the input with an added "filename" column
-fetch_tides = function(x = tide_stations(),
-                       path = oame_path("NOAA", "tides")){
-  x |>
-    dplyr::rowwise() |>
-    dplyr::group_map(
-      function(row, key){
-        ofile = file.path(path, basename(row$url))
-        ok = download.file(row$url, 
-                           ofile,
-                           mode = "wb")
-        row |> 
-          dplyr::mutate(filename = ofile)
-      }
-    ) |>
-    dplyr::bind_rows()
-}
-
-
 #' Read tide data
 #' 
 #' @export
