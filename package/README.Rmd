@@ -20,12 +20,28 @@ The [oame R package]() serves Maine-centric ocean accounts data.
   + [tidyr](https://CRAN.R-project.org/package=tidyr)
   + [readr](https://CRAN.R-project.org/package=readr)
   + [yaml](https://CRAN.R-project.org/package=yaml)
-  
+
+
+## Clone the repos
+
+Clone the original (or a fork of the orginal) to your local machine/
+
+## Set up the data path
+
+TO keep things simple for the end user, set up a text file (YAML format) in the users home directory: `~/.oame`
+
+The from within R store the correct data path into the file.  Here's an example, but obviously you would amend the path to fit your situation.
+
+```
+library(yaml)
+x = list(data_path = "/mnt/ecocast/corecode/R/oceanaccounts/oame/data" )
+write_yaml(x, "~/.oame")
+```
 
 ## Installation
 
 ```
-remotes::install_github("BigelowLab/ocean-accounts-maine/package")
+remotes::install_github("BigelowLab/ocean-accounts-maine/package", upgrade = FALSE)
 ```
 
 ## Reading data
