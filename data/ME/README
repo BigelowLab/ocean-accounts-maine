@@ -10,3 +10,8 @@ gulf_of_maine_regions.gpkg
 
 Derived from computations on GEBCO bathymetry data 2023-08-23 BTT
 Copied over from the GOM-Series paper repos forund here /mnt/s1/projects/ecocast/projects/nrecord/gom-series
+
+Maine Coastal County FIPS Codes (geoid) - from NOEP DB
+
+me_coastal_county_geoid.csv.gz
+

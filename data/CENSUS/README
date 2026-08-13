@@ -1,0 +1,6 @@
+
+data requested from package `tidycensus`
+
+acs5_county_2009_2024.csv.gz - american community survey 5-year county level estimates for population, housing units and median home value (2009-2024)
+
+acs5_county_subdivision_2009_2024.csv.gz - american community survey 5-year county subdivision level estimates for population, housing units and median home value (2009-2024)

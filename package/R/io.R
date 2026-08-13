@@ -125,3 +125,32 @@ read_regions = function(filename = oame_path("ME", "gulf_of_maine_regions.gpkg")
   if (!is.null(crs)) x = sf::st_transform(x, crs)
   x
 }
+
+#' Read Maine coastal county FIPS codes (geoid)
+#' 
+#' @export
+#' @param filename path specification for the file
+#' @return tibble
+read_me_coastal_counties = function(filename = oame_path("ME", "me_coastal_county_geoid.csv.gz")){
+  x = readr::read_csv(filename)
+  x
+}
+
+#' Read Maine census data
+#' 
+#' @export
+#' @param which string choice of geometry level for census data
+#' @returns tibble
+read_census = function(which = c("county", "county_subdivision")[1]) {
+  switch(which,
+         "county" = {
+           filename = oame_path("CENSUS", "acs5_county_2009_2024.csv.gz")
+           x = readr::read_csv(filename)
+         },
+         "county_subdivision" = {
+           filename = oame_path("CENSUS", "acs5_county_subdivision_2009_2024.csv.gz")
+           x = readr::read_csv(filename)
+         })
+  x
+}
+
