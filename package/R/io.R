@@ -154,3 +154,11 @@ read_census = function(which = c("county", "county_subdivision")[1]) {
   x
 }
 
+#' Read hurricane data
+#' 
+#' @export
+#' @param filename chr, the path specification for the file
+#' @return SF LINESTRING data by storm
+read_hurdat = function(filename = oame_path("NOAA/hurdat2/gom_storms.rds")) {
+  readRDS(filename)
+}
