@@ -117,3 +117,11 @@ read_me_counties = function(filename = oame_path("ME", "Maine_County_Boundary_Po
   x
 }
 
+#' @rdname read_me_counties
+#' @export
+read_regions = function(filename = oame_path("ME", "gulf_of_maine_regions.gpkg"),
+                        crs = NULL){
+  x = sf::read_sf(filename)
+  if (!is.null(crs)) x = sf::st_transform(x, crs)
+  x
+}

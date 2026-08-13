@@ -24,6 +24,7 @@ ui <- shiny::fluidPage(
   
     bslib::navset_tab(
       nav_panel("Climatology", 
+                fluidRow(
                 selectInput("Index",
                             "Choose an index to plot",
                             choices= c("AMO", "NAO", "Tides"),
@@ -31,13 +32,15 @@ ui <- shiny::fluidPage(
                 selectInput("indexType",
                             "Choose a plot style",
                             choices = c("timeseries", "monthly", "climatology"),
-                            selected = "timeseries"),
+                            selected = "timeseries")
+                ),
                 div(style = "height: 70vh; overflow-x: auto; display: flex;",
                     div(style = "width: 68vh; flex-shrink: 0; margin: 1vh;", 
                         bigelowshinytheme::bigelow_card(headerContent = "Climatology",
                                                         plotOutput("indexPlot", width = "100%", height = "100%")))
                   )),
       nav_panel("DMR Landings Map", 
+                fluidRow(
                 selectInput("dmrMapSpecies",
                             "Choose species",
                             choices = DMR$species |> unique() |> sort(),
@@ -54,7 +57,8 @@ ui <- shiny::fluidPage(
                 selectInput("dmrMapStyle",
                             "Choose style",
                             choices = c("plain", "cartogram"),
-                            selected = "plain"),           
+                            selected = "plain"),  
+                ),
                 div(style = "height: 70vh; overflow-x: auto; display: flex;",
                     div(style = "width: 68vh; flex-shrink: 0; margin: 1vh;", 
                         bigelowshinytheme::bigelow_card(headerContent = "DMR Landings Map by County",

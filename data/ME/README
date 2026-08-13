@@ -4,3 +4,9 @@ Maine_County_Boundary_Polygons_Dissolved_Feature.geojson
 Downloaded and resaved as geopackage 2026-07-20 by BTT from
 
 https://maine.hub.arcgis.com/datasets/maine::maine-county-boundary-polygons-dissolved-feature-1/about
+
+
+gulf_of_maine_regions.gpkg
+
+Derived from computations on GEBCO bathymetry data 2023-08-23 BTT
+Copied over from the GOM-Series paper repos forund here /mnt/s1/projects/ecocast/projects/nrecord/gom-series

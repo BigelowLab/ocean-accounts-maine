@@ -2,11 +2,17 @@
 % Please edit documentation in R/io.R
 \name{read_me_counties}
 \alias{read_me_counties}
+\alias{read_regions}
 \title{Read Maine county boundary files}
 \usage{
 read_me_counties(
   filename = oame_path("ME", "Maine_County_Boundary_Polygons_Dissolved_Feature.gpkg"),
   simplify = TRUE,
+  crs = NULL
+)
+
+read_regions(
+  filename = oame_path("ME", "gulf_of_maine_regions.gpkg"),
   crs = NULL
 )
 }
