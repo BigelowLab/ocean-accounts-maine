@@ -174,3 +174,11 @@ read_coast = function(filename = oame_path("NaturalEarth/gom_coast.rds")) {
     sf::st_geometry()
 }
 
+#' Reads HAB index
+#' 
+#' @export
+#' @param filename chr, the path specification for the file
+#' @return tibble
+read_hab_index = function(filename = oame_path("hab", "hab-index-2026-08-11.csv.gz")) {
+  readr::read_csv(filename)
+}
