@@ -1,0 +1,9 @@
+HAB Index - describes severity of PST season in eastern and western Maine coast
+
+Combination of 3 categories per region:
+
+% of stations that detect PST (bins = <20, <40, <60, <80, <100)
+
+Cummulative/mean toxicity - sum of samples >=40/total number of samples (bins = <500, <1000, <1500, <2000, >=2000)
+
+Duration (days) of between first and last detection of toxicity >=40 (bins = <50, <100, <150, <200, >=200)
