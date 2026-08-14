@@ -5,10 +5,12 @@ suppressPackageStartupMessages({
   library(dplyr)
   library(ggplot2)
   library(ggokabeito)
+  library(colorspace)
+  library(sf)
 })
 
 DMR = read_dmr_landings()
 AMO = read_amo()
 NAO = read_nao()
 COUNTIES = read_me_counties()
-
+HURDAT = read_hurdat()

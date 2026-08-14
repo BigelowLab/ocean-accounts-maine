@@ -14,6 +14,8 @@ AMO = oame::read_amo()
 NAO = oame::read_nao()
 TIDE = oame::read_tide()
 COUNTIES = oame::read_me_counties(crs = 3857)
+HURDAT = oame::read_hurdat()
+COAST = oame::read_coast()
 
 
 ui <- shiny::fluidPage(
@@ -66,7 +68,26 @@ ui <- shiny::fluidPage(
                                                                       width = "100%", 
                                                                       height = "100%")))
                     )
+                ),
+      nav_panel("Hurricanes", 
+                fluidRow(
+                  selectInput("hurdatEpoch",
+                              "Choose years of epoch",
+                              choices = c(10, 25, 50, 100),
+                              selected = 25),
+                  selectInput("hurdatVariable",
+                              "Choose a variable",
+                              choices=c("wind_max_sus", "duration", "min_pres"),
+                              selected="wind_max_sus")
+                ),
+                div(style = "height: 70vh; overflow-x: auto; display: flex;",
+                    div(style = "width: 68vh; flex-shrink: 0; margin: 1vh;", 
+                        bigelowshinytheme::bigelow_card(headerContent = "NOAA Hurricane Data",
+                                                        plotOutput("hurdatOutput", 
+                                                                   width = "100%", 
+                                                                   height = "100%")))
                 )
+      ) #hurricanes
     ), #navset_bar
   ), #main body
   # Footer with bigelow logo
@@ -124,6 +145,26 @@ server <- function(input, output, session) {
                           varname = varname,
                           counties = COUNTIES,
                           style = style))
+  })
+  ### 
+  #  hurdat
+  ###
+  hurdat_epoch =  reactive({
+    input$hurdatEpoch
+  }) 
+  
+  hurdat_variable =  reactive({
+    input$hurdatVariable
+  }) 
+  
+  output$hurdatPlot <- renderPlot({
+    epoch = hurdat_epoch()
+    color_by = hurdat_variable()
+    oame::map_hurdat(x = HURDAT, 
+               epoch = epoch,
+               color_by = color_by,
+               counties = COUNTIES,
+               coast = COAST)
   })
   
 }

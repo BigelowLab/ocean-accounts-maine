@@ -162,3 +162,15 @@ read_census = function(which = c("county", "county_subdivision")[1]) {
 read_hurdat = function(filename = oame_path("NOAA/hurdat2/gom_storms.rds")) {
   readRDS(filename)
 }
+
+
+#' Read coastline geometry
+#' 
+#' @export
+#' @param filename chr, the path specification for the file
+#' @return sfc geometry for the coast
+read_coast = function(filename = oame_path("NaturalEarth/gom_coast.rds")) {
+  readRDS(filename) |>
+    sf::st_geometry()
+}
+
