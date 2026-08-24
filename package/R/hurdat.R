@@ -25,10 +25,13 @@ map_hurdat = function(x = read_hurdat(),
     library(sf)
     x = read_hurdat()
     epoch = 50
+    color_by = "wind_max_sus"
     counties = read_me_counties() |>
       sf::st_crop(x)
     coast = read_coast()
   }
+  
+  epoch = as.numeric(epoch)
   
   code_epoch = function(y = c(1851, 1922, 1877, 2025),
                         epoch = c(10, 25, 50, 100)[3]){

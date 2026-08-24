@@ -146,6 +146,7 @@ server <- function(input, output, session) {
                           counties = COUNTIES,
                           style = style))
   })
+  
   ### 
   #  hurdat
   ###
@@ -157,7 +158,7 @@ server <- function(input, output, session) {
     input$hurdatVariable
   }) 
   
-  output$hurdatPlot <- renderPlot({
+  output$hurdatOutput <- renderPlot({
     epoch = hurdat_epoch()
     color_by = hurdat_variable()
     oame::map_hurdat(x = HURDAT, 
