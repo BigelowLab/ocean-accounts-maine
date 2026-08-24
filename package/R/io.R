@@ -107,7 +107,7 @@ read_dmr_landings = function(when = c("modern", "historic", "merged")[3]){
 read_me_counties = function(filename = oame_path("ME", "Maine_County_Boundary_Polygons_Dissolved_Feature.rds"),
                             simplify = TRUE,
                             crs = NULL){
-  x = sf::read_sf(filename)
+  x = readRDS(filename)
   if (simplify){
     x = x |>
       dplyr::select(dplyr::all_of("COUNTY")) |>
@@ -121,7 +121,7 @@ read_me_counties = function(filename = oame_path("ME", "Maine_County_Boundary_Po
 #' @export
 read_regions = function(filename = oame_path("ME", "gulf_of_maine_regions.rds"),
                         crs = NULL){
-  x = sf::read_sf(filename)
+  x = readRDS(filename)
   if (!is.null(crs)) x = sf::st_transform(x, crs)
   x
 }
