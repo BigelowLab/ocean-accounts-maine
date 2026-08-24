@@ -104,7 +104,7 @@ read_dmr_landings = function(when = c("modern", "historic", "merged")[3]){
 #'   table (not the case change from "COUNTY")
 #' @param crs NULL or a crs to transform the geometry
 #' @return sf MULTIPLOYGON table
-read_me_counties = function(filename = oame_path("ME", "Maine_County_Boundary_Polygons_Dissolved_Feature.gpkg"),
+read_me_counties = function(filename = oame_path("ME", "Maine_County_Boundary_Polygons_Dissolved_Feature.rds"),
                             simplify = TRUE,
                             crs = NULL){
   x = sf::read_sf(filename)
@@ -119,7 +119,7 @@ read_me_counties = function(filename = oame_path("ME", "Maine_County_Boundary_Po
 
 #' @rdname read_me_counties
 #' @export
-read_regions = function(filename = oame_path("ME", "gulf_of_maine_regions.gpkg"),
+read_regions = function(filename = oame_path("ME", "gulf_of_maine_regions.rds"),
                         crs = NULL){
   x = sf::read_sf(filename)
   if (!is.null(crs)) x = sf::st_transform(x, crs)

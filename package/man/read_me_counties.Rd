@@ -6,13 +6,13 @@
 \title{Read Maine county boundary files}
 \usage{
 read_me_counties(
-  filename = oame_path("ME", "Maine_County_Boundary_Polygons_Dissolved_Feature.gpkg"),
+  filename = oame_path("ME", "Maine_County_Boundary_Polygons_Dissolved_Feature.rds"),
   simplify = TRUE,
   crs = NULL
 )
 
 read_regions(
-  filename = oame_path("ME", "gulf_of_maine_regions.gpkg"),
+  filename = oame_path("ME", "gulf_of_maine_regions.rds"),
   crs = NULL
 )
 }
