@@ -5,7 +5,6 @@ suppressPackageStartupMessages({
   library(bigelowshinytheme)
   library(leaflet)
   library(dplyr)
-  library(sf)
 })
 
 # bigelowshinytheme::copy_www("package/inst/shiny")
