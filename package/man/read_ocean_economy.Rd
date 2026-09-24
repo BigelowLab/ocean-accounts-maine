@@ -4,10 +4,15 @@
 \alias{read_ocean_economy}
 \title{Reads ocean economy data}
 \usage{
-read_ocean_economy(filename = oame_path("NOEP", "me_ocean_economy.csv.gz"))
+read_ocean_economy(
+  filename = oame_path("NOEP", "me_ocean_economy.csv.gz"),
+  coastal_states = FALSE
+)
 }
 \arguments{
 \item{filename}{chr, the path specification for the file}
+
+\item{coastal_states}{locical, if TRUE includes total for all coastal states}
 }
 \value{
 tibble
