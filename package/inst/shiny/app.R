@@ -16,6 +16,10 @@ TIDE = oame::read_tide()
 COUNTIES = oame::read_me_counties(crs = 3857)
 HURDAT = oame::read_hurdat()
 COAST = oame::read_coast()
+OCEAN_ECON = oame::read_ocean_economy() |>
+  dplyr::mutate(gdp = gdp/1000000000,
+                rgdp = rgdp/1000000000,
+                wages = wages/1000000000)
 
 
 ui <- shiny::fluidPage(
@@ -87,7 +91,25 @@ ui <- shiny::fluidPage(
                                                                    width = "100%", 
                                                                    height = "100%")))
                 )
-      ) #hurricanes
+      ), #hurricanes
+      nav_panel("Ocean Economy",
+                layout_sidebar(
+                  sidebar = sidebar(
+                    selectInput("oe_area",
+                                "Choose an area",
+                                choices = unique(OCEAN_ECON$county),
+                                selected = "Maine State"),
+                    selectInput("oe_var",
+                                "Choose a variable",
+                                choices = c("gdp", "rgdp", "establishments", "employment", "wages"))
+                    #selectInput("oe_sector",
+                    #            "Choose a sector",
+                    #            choices=unique(OCEAN_ECON$sector))
+                  ),
+                  bigelowshinytheme::bigelow_card(headerContent = "Maine Ocean Economy",
+                                                  plotOutput("ocean_econ_plot"))
+                )
+      ) #ocean economy sb
     ), #navset_bar
   ), #main body
   # Footer with bigelow logo
@@ -168,6 +190,26 @@ server <- function(input, output, session) {
                coast = COAST)
   })
   
+  
+  ocean_econ_data = reactive({
+    
+    if (input$oe_area == "Maine State") {
+      dplyr::filter(OCEAN_ECON, 
+                    county %in% input$oe_area,
+                    industry == "Total",
+                    #sector %in% input$oe_sector, 
+                    !sector == "Ocean Economy")
+    } else {
+      dplyr::filter(OCEAN_ECON, 
+                    county %in% input$oe_area, 
+                    #sector %in% input$oe_sector, 
+                    !sector == "Ocean Economy")
+    }
+  })
+  
+  output$ocean_econ_plot = renderPlot({
+      oame::plot_ocean_economy(ocean_econ_data(), y_var = input$oe_var)
+  })
 }
 
 shinyApp(ui, server)

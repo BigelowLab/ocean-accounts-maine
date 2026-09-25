@@ -1,0 +1,3 @@
+Data requested from NOEP api for National, Maine State total and county level ocean economy information.
+
+query_url = "https://oceaneconomics.org/Api/Ocean/econData?geoId=00000,23000,23005,23009,23013,23015,23023,23027,23029,23031"

@@ -182,3 +182,16 @@ read_coast = function(filename = oame_path("NaturalEarth/gom_coast.rds")) {
 read_hab_index = function(filename = oame_path("hab", "hab-index-2026-08-11.csv.gz")) {
   readr::read_csv(filename)
 }
+
+#' Reads ocean economy data
+#' 
+#' @export
+#' @param filename chr, the path specification for the file
+#' @param coastal_states locical, if TRUE includes total for all coastal states
+#' @return tibble
+read_ocean_economy = function(filename = oame_path("NOEP", "me_ocean_economy.csv.gz"),
+                              coastal_states = FALSE) {
+  oe = readr::read_csv(filename)
+  
+  if (coastal_states == FALSE) oe = dplyr::filter(oe, !county == "Coastal States")
+}
