@@ -20,6 +20,7 @@ OCEAN_ECON = oame::read_ocean_economy() |>
   dplyr::mutate(gdp = gdp/1000000000,
                 rgdp = rgdp/1000000000,
                 wages = wages/1000000000)
+CENSUS = oame::read_census()
 
 
 ui <- shiny::fluidPage(
@@ -29,6 +30,23 @@ ui <- shiny::fluidPage(
   bigelow_main_body(
   
     bslib::navset_tab(
+      nav_panel("Ocean Economy",
+                layout_sidebar(
+                  sidebar = sidebar(
+                    selectInput("oe_area",
+                                "Choose an area",
+                                choices = unique(OCEAN_ECON$county),
+                                selected = "Maine State"),
+                    selectInput("oe_var",
+                                "Choose a variable",
+                                choices = c("gdp", "rgdp", "establishments", "employment", "wages"))
+                    #selectInput("oe_sector",
+                    #            "Choose a sector",
+                    #            choices=unique(OCEAN_ECON$sector))
+                  ),
+                  bigelowshinytheme::bigelow_card(headerContent = "Maine Ocean Economy",
+                                                  plotOutput("ocean_econ_plot"))
+                )), #ocean economy sb
       nav_panel("Climatology", 
                 fluidRow(
                 selectInput("Index",
@@ -45,7 +63,7 @@ ui <- shiny::fluidPage(
                         bigelowshinytheme::bigelow_card(headerContent = "Climatology",
                                                         plotOutput("indexPlot", width = "100%", height = "100%")))
                   )),
-      nav_panel("DMR Landings Map", 
+      nav_panel("Fisheries Landings", 
                 fluidRow(
                 selectInput("dmrMapSpecies",
                             "Choose species",
@@ -71,7 +89,14 @@ ui <- shiny::fluidPage(
                                                         plotOutput("dmrMapOutput", 
                                                                       width = "100%", 
                                                                       height = "100%")))
-                    )
+                    ),
+                div(style = "height: 70vh; overflow-x: auto; display: flex;",
+                    div(style = "width: 68vh; flex-shrink: 0; margin: 1vh;", 
+                        bigelowshinytheme::bigelow_card(headerContent = "DMR Landings Timeseries",
+                                                        plotOutput("dmr_timeseries", 
+                                                                   width = "100%", 
+                                                                   height = "100%")))
+                )
                 ),
       nav_panel("Hurricanes", 
                 fluidRow(
@@ -92,24 +117,17 @@ ui <- shiny::fluidPage(
                                                                    height = "100%")))
                 )
       ), #hurricanes
-      nav_panel("Ocean Economy",
+      nav_panel("Census",
                 layout_sidebar(
                   sidebar = sidebar(
-                    selectInput("oe_area",
-                                "Choose an area",
-                                choices = unique(OCEAN_ECON$county),
-                                selected = "Maine State"),
-                    selectInput("oe_var",
+                    selectInput("census_var",
                                 "Choose a variable",
-                                choices = c("gdp", "rgdp", "establishments", "employment", "wages"))
-                    #selectInput("oe_sector",
-                    #            "Choose a sector",
-                    #            choices=unique(OCEAN_ECON$sector))
+                                choices = c("population", "housing", "med_home_value"))
                   ),
-                  bigelowshinytheme::bigelow_card(headerContent = "Maine Ocean Economy",
-                                                  plotOutput("ocean_econ_plot"))
+                  bigelowshinytheme::bigelow_card(headerContent = "Maine Census Data",
+                                                  plotOutput("census_plot"))
                 )
-      ) #ocean economy sb
+      ) # census
     ), #navset_bar
   ), #main body
   # Footer with bigelow logo
@@ -152,7 +170,7 @@ server <- function(input, output, session) {
   }) 
   dmrMap_style = reactive({
     input$dmrMapStyle
-  }) 
+  })
   
   output$dmrMapOutput <- renderPlot({
     years = dmrMap_years()
@@ -167,6 +185,12 @@ server <- function(input, output, session) {
                           varname = varname,
                           counties = COUNTIES,
                           style = style))
+  })
+  
+  output$dmr_timeseries = renderPlot({
+    spp = dmrMap_species()
+    varname = dmrMap_varname()
+    suppressWarnings(oame::plot_landings(x = DMR, spp=spp, varname = varname))
   })
   
   ### 
@@ -208,7 +232,11 @@ server <- function(input, output, session) {
   })
   
   output$ocean_econ_plot = renderPlot({
-      oame::plot_ocean_economy(ocean_econ_data(), y_var = input$oe_var)
+    suppressWarnings(oame::plot_ocean_economy(ocean_econ_data(), y_var = input$oe_var))
+  })
+  
+  output$census_plot = renderPlot({
+    oame::plot_census(CENSUS, y_var = input$census_var)
   })
 }
 
