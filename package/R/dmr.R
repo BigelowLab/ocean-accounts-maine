@@ -149,7 +149,31 @@ plot_dmr_county = function(x = "year",
     data = data |>
       aggregate_dmr_landings_county()
   }
+}
+
+#' Plots DMR landings data over time for different variables
+#' 
+#' @export
+#' @param x tibble of landings data from DMR
+#' @param varname character string variable for y axis
+#' @returns a ggplot
+plot_landings = function(x, spp, varname) {
   
+  ylabel <- case_when(
+    varname == "trip_n" ~ "Number of Trips",
+    varname == "harv_n" ~ "Number of Harvestors",
+    varname == "weight" ~ "Weight (lbs)",
+    varname == "value" ~ "Value ($)"
+  )
   
+  x = prep_dmr_landings_county(x) |>
+    dplyr::ungroup() |>
+    dplyr::filter(.data$species %in% spp) |>
+    oame::aggregate_dmr_landings_county()
   
+  ggplot2::ggplot(data=x, ggplot2::aes(x=year, y=!!ensym(varname), color=county)) +
+    ggplot2::geom_line() + 
+    ggplot2::geom_point(ggplot2::aes(shape = county)) + 
+    ggplot2::ylab(ylabel) +
+    ggplot2::theme_bw()
 }

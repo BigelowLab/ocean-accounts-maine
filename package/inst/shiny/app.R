@@ -63,7 +63,7 @@ ui <- shiny::fluidPage(
                         bigelowshinytheme::bigelow_card(headerContent = "Climatology",
                                                         plotOutput("indexPlot", width = "100%", height = "100%")))
                   )),
-      nav_panel("DMR Landings Map", 
+      nav_panel("Fisheries Landings", 
                 fluidRow(
                 selectInput("dmrMapSpecies",
                             "Choose species",
@@ -89,7 +89,14 @@ ui <- shiny::fluidPage(
                                                         plotOutput("dmrMapOutput", 
                                                                       width = "100%", 
                                                                       height = "100%")))
-                    )
+                    ),
+                div(style = "height: 70vh; overflow-x: auto; display: flex;",
+                    div(style = "width: 68vh; flex-shrink: 0; margin: 1vh;", 
+                        bigelowshinytheme::bigelow_card(headerContent = "DMR Landings Timeseries",
+                                                        plotOutput("dmr_timeseries", 
+                                                                   width = "100%", 
+                                                                   height = "100%")))
+                )
                 ),
       nav_panel("Hurricanes", 
                 fluidRow(
@@ -163,7 +170,7 @@ server <- function(input, output, session) {
   }) 
   dmrMap_style = reactive({
     input$dmrMapStyle
-  }) 
+  })
   
   output$dmrMapOutput <- renderPlot({
     years = dmrMap_years()
@@ -178,6 +185,12 @@ server <- function(input, output, session) {
                           varname = varname,
                           counties = COUNTIES,
                           style = style))
+  })
+  
+  output$dmr_timeseries = renderPlot({
+    spp = dmrMap_species()
+    varname = dmrMap_varname()
+    suppressWarnings(oame::plot_landings(x = DMR, spp=spp, varname = varname))
   })
   
   ### 
@@ -219,7 +232,7 @@ server <- function(input, output, session) {
   })
   
   output$ocean_econ_plot = renderPlot({
-      oame::plot_ocean_economy(ocean_econ_data(), y_var = input$oe_var)
+    suppressWarnings(oame::plot_ocean_economy(ocean_econ_data(), y_var = input$oe_var))
   })
   
   output$census_plot = renderPlot({
