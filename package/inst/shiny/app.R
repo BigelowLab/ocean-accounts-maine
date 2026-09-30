@@ -21,6 +21,7 @@ OCEAN_ECON = oame::read_ocean_economy() |>
                 rgdp = rgdp/1000000000,
                 wages = wages/1000000000)
 CENSUS = oame::read_census()
+LABS = oame::read_labs()
 
 
 ui <- shiny::fluidPage(
@@ -127,7 +128,11 @@ ui <- shiny::fluidPage(
                   bigelowshinytheme::bigelow_card(headerContent = "Maine Census Data",
                                                   plotOutput("census_plot"))
                 )
-      ) # census
+      ), # census
+      nav_panel("Research",
+                bigelowshinytheme::bigelow_card(headerContent = "Research, Innovation and Education",
+                                                leafletOutput("research_map"))
+      ), # research
     ), #navset_bar
   ), #main body
   # Footer with bigelow logo
@@ -237,6 +242,10 @@ server <- function(input, output, session) {
   
   output$census_plot = renderPlot({
     oame::plot_census(CENSUS, y_var = input$census_var)
+  })
+  
+  output$research_map = renderLeaflet({
+    oame::map_labs(LABS)
   })
 }
 

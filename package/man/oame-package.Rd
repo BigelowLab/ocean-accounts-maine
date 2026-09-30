@@ -8,4 +8,14 @@
 \description{
 Serve Maine Ocean Accounts data.
 }
+\author{
+\strong{Maintainer}: Ben Tupper \email{btupper@bigelow.org}
+
+Authors:
+\itemize{
+  \item Ben Tupper \email{btupper@bigelow.org}
+  \item Johnathan Evanilla \email{jevanilla@bigelow.org}
+}
+
+}
 \keyword{internal}
