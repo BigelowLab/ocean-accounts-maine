@@ -1,0 +1,5 @@
+Curated table of Maine research, innovation and education institutions
+
+Addresses compiled from Google Maps and institution webpages in google sheet
+
+Locations geocoded from addresses using package tidygeocoder
