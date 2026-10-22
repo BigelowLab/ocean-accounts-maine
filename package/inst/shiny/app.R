@@ -40,10 +40,8 @@ ui <- shiny::fluidPage(
                                 selected = "Maine State"),
                     selectInput("oe_var",
                                 "Choose a variable",
-                                choices = c("gdp", "rgdp", "establishments", "employment", "wages"))
-                    #selectInput("oe_sector",
-                    #            "Choose a sector",
-                    #            choices=unique(OCEAN_ECON$sector))
+                                choices = c("gdp", "rgdp", "establishments", "employment", "wages")),
+                    uiOutput("me_state_ui")
                   ),
                   bigelowshinytheme::bigelow_card(headerContent = "Maine Ocean Economy",
                                                   plotOutput("ocean_econ_plot"))
@@ -133,6 +131,9 @@ ui <- shiny::fluidPage(
                 bigelowshinytheme::bigelow_card(headerContent = "Research, Innovation and Education",
                                                 leafletOutput("research_map"))
       ), # research
+      nav_panel("Aquaculture",
+                bigelowshinytheme::bigelow_card(htmlOutput("arcgis_embed"))
+      ), # research
     ), #navset_bar
   ), #main body
   # Footer with bigelow logo
@@ -220,24 +221,46 @@ server <- function(input, output, session) {
   })
   
   
+  output$me_state_ui = renderUI({
+    req(input$oe_area == "Maine State")
+    tagList(
+      selectInput("oe_sector",
+                  "Choose a sector",
+                  choices=unique(OCEAN_ECON$sector)),
+      selectInput("oe_industry",
+                  "Choose an industry",
+                  choices=unique(OCEAN_ECON$industry))
+    )
+  })
+  
   ocean_econ_data = reactive({
     
     if (input$oe_area == "Maine State") {
       dplyr::filter(OCEAN_ECON, 
                     county %in% input$oe_area,
-                    industry == "Total",
+                    industry == "Total")
                     #sector %in% input$oe_sector, 
-                    !sector == "Ocean Economy")
+                    #!sector == "Ocean Economy")
     } else {
       dplyr::filter(OCEAN_ECON, 
-                    county %in% input$oe_area, 
-                    #sector %in% input$oe_sector, 
-                    !sector == "Ocean Economy")
+                    county %in% input$oe_area)
     }
   })
   
   output$ocean_econ_plot = renderPlot({
     suppressWarnings(oame::plot_ocean_economy(ocean_econ_data(), y_var = input$oe_var))
+  })
+  
+  output$arcgis_embed <- renderUI({
+    exp_url <- "https://experience.arcgis.com/experience/12b3838db40b4484a6b39858528749ed"
+    
+    tags$iframe(
+      src = exp_url,
+      width = "100%",
+      height = "600px",
+      frameborder = "0",
+      allowfullscreen = TRUE
+    )
   })
   
   output$census_plot = renderPlot({
