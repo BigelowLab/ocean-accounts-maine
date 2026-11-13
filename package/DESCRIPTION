@@ -18,6 +18,8 @@ Imports:
   ggplot2,
   yaml,
   sf,
-  cartogram
+  cartogram, 
+  leaflet,
+  plotly
 Roxygen: list(markdown = TRUE)
-Config/roxygen2/version: 8.1.0
+Config/roxygen2/version: 8.1.1
