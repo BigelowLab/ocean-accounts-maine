@@ -202,5 +202,6 @@ read_ocean_economy = function(filename = oame_path("NOEP", "me_ocean_economy.csv
 #' @param filename chr, the path specification for the file
 #' @return tibble
 read_labs = function(filename = oame_path("LABS", "me_marine_labs.csv.gz")) {
-  readr::read_csv(filename)
+  readr::read_csv(filename) |>
+    dplyr::filter(!dplyr::if_any(c(lat, long), is.na))
 }

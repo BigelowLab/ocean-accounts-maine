@@ -40,9 +40,13 @@ plot_ocean_economy_i = function(plot_data, y_var = "gdp") {
     y_var == "establishments" ~ "Establishments"
   )
   
-  plotly::plot_ly(plot_data, x = ~year, y=~get(y_var), color=~sector, connectgaps=TRUE) |>
-    plotly::add_trace(mode="lines+markers") |>
+  plotly::plot_ly(plot_data, x = ~year, y=~get(y_var), 
+                  type = "scatter", 
+                  mode="lines+markers",
+                  color=~sector, connectgaps=TRUE) |>
     plotly::layout(hovermode = "x unified",
+                   #hoversort = "value ascending",
+                   hoverlabel = list(namelength=-1),
                    xaxis = list(title = ""),
                    yaxis = list(title = ylabel))
   
