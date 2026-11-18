@@ -3,7 +3,7 @@
 library(readr)
 library(tidygeocoder)
 
-foo = read_csv("Maine Marine Science Institutions Curated.csv")
+foo = read_csv("Maine Marine Science Institutions - Curated.csv")
 
 x <- foo |>
   geocode(address, method = 'osm', lat = latitude , long = longitude)
