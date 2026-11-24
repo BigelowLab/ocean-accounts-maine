@@ -1,3 +1,5 @@
+
+
 suppressPackageStartupMessages({
   library(oame)
   library(shiny)
@@ -5,270 +7,303 @@ suppressPackageStartupMessages({
   library(bigelowshinytheme)
   library(leaflet)
   library(dplyr)
+  library(plotly)
+  library(shinyWidgets)
+  library(bsicons)
+  library(scales)
 })
 
-# bigelowshinytheme::copy_www("package/inst/shiny")
+OCEAN_ECON = oame::read_ocean_economy() 
 DMR = oame::read_dmr_landings("modern") |>
   oame::prep_dmr_landings_county()
-AMO = oame::read_amo()
-NAO = oame::read_nao()
-TIDE = oame::read_tide()
-COUNTIES = oame::read_me_counties(crs = 3857)
-HURDAT = oame::read_hurdat()
-COAST = oame::read_coast()
-OCEAN_ECON = oame::read_ocean_economy() |>
-  dplyr::mutate(gdp = gdp/1000000000,
-                rgdp = rgdp/1000000000,
-                wages = wages/1000000000)
-CENSUS = oame::read_census()
 LABS = oame::read_labs()
 
+filter_choices <- sort(unique(LABS$category))
+pal <- colorFactor(c("#2C6E8F", "#E0A030", "#5B8C3A"), domain = filter_choices)
 
-ui <- shiny::fluidPage(
+
+ui <- page_fillable(
   theme = bigelowshinytheme::bigelow_theme(),
-  includeCSS("www/additionalStyles.css"),
-  bigelow_header(h2("Ocean Accounts - Maine")),
-  bigelow_main_body(
-  
-    bslib::navset_tab(
-      nav_panel("Ocean Economy",
-                layout_sidebar(
-                  sidebar = sidebar(
-                    selectInput("oe_area",
-                                "Choose an area",
-                                choices = unique(OCEAN_ECON$county),
-                                selected = "Maine State"),
-                    selectInput("oe_var",
-                                "Choose a variable",
-                                choices = c("gdp", "rgdp", "establishments", "employment", "wages")),
-                    uiOutput("me_state_ui")
-                  ),
-                  bigelowshinytheme::bigelow_card(headerContent = "Maine Ocean Economy",
-                                                  plotOutput("ocean_econ_plot"))
-                )), #ocean economy sb
-      nav_panel("Climatology", 
-                fluidRow(
-                selectInput("Index",
-                            "Choose an index to plot",
-                            choices= c("AMO", "NAO", "Tides"),
-                            selected= "AMO"),
-                selectInput("indexType",
-                            "Choose a plot style",
-                            choices = c("timeseries", "monthly", "climatology"),
-                            selected = "timeseries")
-                ),
-                div(style = "height: 70vh; overflow-x: auto; display: flex;",
-                    div(style = "width: 68vh; flex-shrink: 0; margin: 1vh;", 
-                        bigelowshinytheme::bigelow_card(headerContent = "Climatology",
-                                                        plotOutput("indexPlot", width = "100%", height = "100%")))
-                  )),
-      nav_panel("Fisheries Landings", 
-                fluidRow(
-                selectInput("dmrMapSpecies",
-                            "Choose species",
-                            choices = DMR$species |> unique() |> sort(),
-                            selected = "Clam Soft"),
-                selectInput("dmrMapVariable",
-                            "Choose a variable",
-                            choices=c("weight", "value", "trip_n", "harv_n"),
-                            selected="trip_n"),
-                selectInput("dmrMapYear",
-                            "Choose years",
-                            choices = c("recent", "all", 
-                                        as.character(seq(from = min(DMR$year),max(DMR$year)))),
-                            selected = "recent"),
-                selectInput("dmrMapStyle",
-                            "Choose style",
-                            choices = c("plain", "cartogram"),
-                            selected = "plain"),  
-                ),
-                div(style = "height: 70vh; overflow-x: auto; display: flex;",
-                    div(style = "width: 68vh; flex-shrink: 0; margin: 1vh;", 
-                        bigelowshinytheme::bigelow_card(headerContent = "DMR Landings Map by County",
-                                                        plotOutput("dmrMapOutput", 
-                                                                      width = "100%", 
-                                                                      height = "100%")))
-                    ),
-                div(style = "height: 70vh; overflow-x: auto; display: flex;",
-                    div(style = "width: 68vh; flex-shrink: 0; margin: 1vh;", 
-                        bigelowshinytheme::bigelow_card(headerContent = "DMR Landings Timeseries",
-                                                        plotOutput("dmr_timeseries", 
-                                                                   width = "100%", 
-                                                                   height = "100%")))
-                )
-                ),
-      nav_panel("Hurricanes", 
-                fluidRow(
-                  selectInput("hurdatEpoch",
-                              "Choose years of epoch",
-                              choices = c(10, 25, 50, 100),
-                              selected = 25),
-                  selectInput("hurdatVariable",
-                              "Choose a variable",
-                              choices=c("wind_max_sus", "duration", "min_pres"),
-                              selected="wind_max_sus")
-                ),
-                div(style = "height: 70vh; overflow-x: auto; display: flex;",
-                    div(style = "width: 68vh; flex-shrink: 0; margin: 1vh;", 
-                        bigelowshinytheme::bigelow_card(headerContent = "NOAA Hurricane Data",
-                                                        plotOutput("hurdatOutput", 
-                                                                   width = "100%", 
-                                                                   height = "100%")))
-                )
-      ), #hurricanes
-      nav_panel("Census",
-                layout_sidebar(
-                  sidebar = sidebar(
-                    selectInput("census_var",
-                                "Choose a variable",
-                                choices = c("population", "housing", "med_home_value"))
-                  ),
-                  bigelowshinytheme::bigelow_card(headerContent = "Maine Census Data",
-                                                  plotOutput("census_plot"))
-                )
-      ), # census
-      nav_panel("Research",
-                bigelowshinytheme::bigelow_card(headerContent = "Research, Innovation and Education",
-                                                leafletOutput("research_map"))
-      ), # research
-      nav_panel("Aquaculture",
-                bigelowshinytheme::bigelow_card(htmlOutput("arcgis_embed"))
-      ), # research
-    ), #navset_bar
-  ), #main body
-  # Footer with bigelow logo
-  bigelowshinytheme::bigelow_footer("Tandy Center for Ocean Forecasting and National Ocean Economics Program")
-) # fluidPage
+  #includeCSS("www/additionalStyles.css"),
+  bigelow_header(h2("Ocean Accounts Maine"),
+                 #div(
+                 #  class = "btn-group",
+                 #  role = "group",
+                 #  actionButton("left", "Map"),
+                 #  actionButton("middle", "Split"),
+                 #  actionButton("right", "Dashboard")
+                 #),
+                 radioGroupButtons(inputId="ui_select", label=NULL, choices=c("Map", "Split", "Dashboard"))
+  ),
+  padding = "1rem",
+  gap = "1rem",
+  uiOutput("ui_layout"),
+  bigelowshinytheme::bigelow_footer("Maine Technology Institute")
+)
 
 server <- function(input, output, session) {
-  ###
-  #  index plot
-  ###
-  index_name = reactive({
-    input$Index
+
+  output$ui_layout = renderUI({
+    switch(input$ui_select,
+           "Map" = {
+             layout_sidebar(
+               sidebar = sidebar(
+                 virtualSelectInput(inputId="map_filter",
+                                    label = "Map Filter",
+                                    choices=list(
+                                      "Research"= c("Non-profit", "Academic", "State Agency", "Investment")
+                                    ),
+                                    multiple=TRUE,
+                                    selected=c("Non-profit", "Academic", "State Agency", "Investment"),
+                                    keepAlwaysOpen=TRUE)
+               ),
+               leafletOutput("research_map", height=800)
+             )
+           },
+           "Split" = {
+             page_fillable(
+               layout_columns(
+                 fill = FALSE, gap = "1rem",
+                 value_box(
+                   title = "Ocean economy GDP",
+                   value = textOutput("gdp_val"),
+                   showcase = icon("location-dot"),
+                   theme = "primary"
+                 ),
+                 value_box(
+                   title = "Total establishments",
+                   value = textOutput("estab_val"),
+                   showcase = icon("location-dot"),
+                   theme = "primary"
+                 ),
+                 value_box(
+                   title = "Total jobs",
+                   value = textOutput("job_val"),
+                   showcase = icon("location-dot"),
+                   theme = "primary"
+                 ),
+                 value_box(
+                   title = "Total wages",
+                   value = textOutput("wage_val"),
+                   showcase = icon("location-dot"),
+                   theme = "primary"
+                 )
+               ),
+               layout_columns(
+                 col_widths = c(6,6), 
+                 #row_heights = c(1, 2),
+                 gap = "1rem",
+                 layout_columns(
+                   col_widths = c(12,12,12),
+                   row_heights = c(1,1,1),
+                   gap = "1rem",
+                   
+                   card(id = "blue_economy_card", 
+                        full_screen = TRUE,
+                        card_header("Blue Economy",
+                                    tooltip(bs_icon("info-circle"),"Blue Economy timeseries information"),
+                                    toolbar(align = "right",
+                                            toolbar_input_select(
+                                              id = "oe_var",
+                                              label = "Variable",
+                                              choices = c("GDP" = "gdp", 
+                                                          "Real GDP" = "rgdp", 
+                                                          "Establishments" = "establishments", 
+                                                          "Emplyment" = "employment", 
+                                                          "Wages" = "wages"),
+                                              selected="gdp",
+                                              icon = icon("filter")),
+                                            toolbar_input_select(
+                                              id = "oe_area",
+                                              label = "Area",
+                                              choices = unique(OCEAN_ECON$county),
+                                              selected="Maine State",
+                                              icon = icon("filter")))),
+                        card_body(plotlyOutput("ocean_econ_plot"))),
+                   card(id = "activity_lease_card", 
+                        full_screen = TRUE,
+                        card_header("Activity & Leases",
+                                    toolbar(
+                                      align = "right",
+                                      toolbar_input_select(
+                                        id = "dmrMapSpecies",
+                                        label = "Species",
+                                        choices = unique(DMR$species),
+                                        selected="Lobster American",
+                                        icon = icon("fish")),
+                                      toolbar_input_select(
+                                        id = "dmrMapVariable",
+                                        label = "Variable",
+                                        choices = c("Weight" = "weight", "Value" = "value", "Trips" = "trip_n", "Harvesters" = "harv_n"),
+                                        selected="value",
+                                        icon = icon("filter")))),
+                        card_body(plotOutput("dmr_timeseries"))),
+                   
+                   card(full_screen = TRUE,
+                        card_header("Ecosystem Funding"))),
+                 
+                 card(full_screen = TRUE,
+                      card_header("Key Infrastructure"),
+                      layout_sidebar(
+                        sidebar = sidebar(
+                          virtualSelectInput(inputId="map_filter",
+                                             label = "Map Filter",
+                                             choices=list(
+                                               "Research"= c("Non-profit", "Academic", "State Agency", "Investment")
+                                             ),
+                                             multiple=TRUE,
+                                             selected=c("Non-profit", "Academic", "State Agency", "Investment"),
+                                             keepAlwaysOpen=TRUE)
+                        ),
+                        leafletOutput("research_map")))
+               )
+             )
+           },
+           "Dashboard" = {
+             layout_column_wrap(
+               width=1,
+               gap = "1rem",
+               card(id = "blue_economy_card", 
+                    full_screen = TRUE,
+                    card_header("Blue Economy",
+                                toolbar(align = "right",
+                                        toolbar_input_select(
+                                          id = "oe_var",
+                                          label = "Variable",
+                                          choices = c("GDP" = "gdp", 
+                                                      "Real GDP" = "rgdp", 
+                                                      "Establishments" = "establishments", 
+                                                      "Emplyment" = "employment", 
+                                                      "Wages" = "wages"),
+                                          selected="gdp",
+                                          icon = icon("filter")),
+                                        toolbar_input_select(
+                                          id = "oe_area",
+                                          label = "Area",
+                                          choices = unique(OCEAN_ECON$county),
+                                          selected="Maine State",
+                                          icon = icon("filter")))),
+                    card_body(plotlyOutput("ocean_econ_plot"))),
+               card(id = "activity_lease_card", 
+                    full_screen = TRUE,
+                    card_header("Activity & Leases",
+                                toolbar(
+                                  align = "right",
+                                  toolbar_input_select(
+                                    id = "dmrMapSpecies",
+                                    label = "Species",
+                                    choices = unique(DMR$species),
+                                    selected="Lobster American",
+                                    icon = icon("fish")),
+                                  toolbar_input_select(
+                                    id = "dmrMapVariable",
+                                    label = "Variable",
+                                    choices = c("Weight" = "weight", "Value" = "value", "Trips" = "trip_n", "Harvesters" = "harv_n"),
+                                    selected="value",
+                                    icon = icon("filter")))),
+                    card_body(plotOutput("dmr_timeseries"))),
+               
+               card(full_screen = TRUE,
+                    card_header("Ecosystem Funding")))
+           })
   })
   
-  index_type = reactive({
-    input$indexType
-  })
-  
-  output$indexPlot <- renderPlot({
-    index = index_name()
-    type = index_type()
-    
-    switch(tolower(index[1]),
-           "nao" = suppressWarnings(oame::plot_nao(NAO, type = type)),
-           "amo" = suppressWarnings(oame::plot_amo(AMO, type = type)),
-           "tides" = oame::plot_tide(TIDE, type = type))
-  })
-  
-  ###
-  #  dmrMap
-  ###
-  dmrMap_years = reactive({
-    input$dmrMapYear
-  }) 
-  dmrMap_species = reactive({
-    input$dmrMapSpecies
-  }) 
-  dmrMap_varname = reactive({
-    input$dmrMapVariable
-  }) 
-  dmrMap_style = reactive({
-    input$dmrMapStyle
-  })
-  
-  output$dmrMapOutput <- renderPlot({
-    years = dmrMap_years()
-    if (!any(c("recent", "all") %in% years)) years = as.numeric(years)
-    spp = dmrMap_species()
-    varname = dmrMap_varname()
-    style = dmrMap_style()
-    
-    suppressWarnings(oame::map_species_by_county(x = DMR,
-                          spp = spp,
-                          years = years,
-                          varname = varname,
-                          counties = COUNTIES,
-                          style = style))
-  })
-  
-  output$dmr_timeseries = renderPlot({
-    spp = dmrMap_species()
-    varname = dmrMap_varname()
-    suppressWarnings(oame::plot_landings(x = DMR, spp=spp, varname = varname))
-  })
-  
-  ### 
-  #  hurdat
-  ###
-  hurdat_epoch =  reactive({
-    input$hurdatEpoch
-  }) 
-  
-  hurdat_variable =  reactive({
-    input$hurdatVariable
-  }) 
-  
-  output$hurdatOutput <- renderPlot({
-    epoch = hurdat_epoch()
-    color_by = hurdat_variable()
-    oame::map_hurdat(x = HURDAT, 
-               epoch = epoch,
-               color_by = color_by,
-               counties = COUNTIES,
-               coast = COAST)
-  })
-  
-  
-  output$me_state_ui = renderUI({
-    req(input$oe_area == "Maine State")
-    tagList(
-      selectInput("oe_sector",
-                  "Choose a sector",
-                  choices=unique(OCEAN_ECON$sector)),
-      selectInput("oe_industry",
-                  "Choose an industry",
-                  choices=unique(OCEAN_ECON$industry))
-    )
-  })
-  
+  # Blue Economy Card
   ocean_econ_data = reactive({
-    
     if (input$oe_area == "Maine State") {
       dplyr::filter(OCEAN_ECON, 
                     county %in% input$oe_area,
                     industry == "Total")
-                    #sector %in% input$oe_sector, 
-                    #!sector == "Ocean Economy")
+      #sector %in% input$oe_sector, 
+      #!sector == "Ocean Economy")
     } else {
       dplyr::filter(OCEAN_ECON, 
                     county %in% input$oe_area)
     }
   })
   
-  output$ocean_econ_plot = renderPlot({
-    suppressWarnings(oame::plot_ocean_economy(ocean_econ_data(), y_var = input$oe_var))
+  gdp = reactive({
+    d = dplyr::filter(ocean_econ_data(), sector == "Ocean Economy", year == max(.data$year))
+    max(d$gdp)
   })
   
-  output$arcgis_embed <- renderUI({
-    exp_url <- "https://experience.arcgis.com/experience/12b3838db40b4484a6b39858528749ed"
+  output$gdp_val = renderText(label_currency()(gdp()))
+  
+  total_establishments = reactive({
+    d = dplyr::filter(ocean_econ_data(), sector == "Ocean Economy", year == max(year))
+    max(d$establishments)
+  })
+  
+  output$estab_val = renderText(total_establishments())
+  
+  total_jobs = reactive({
+    d = dplyr::filter(ocean_econ_data(), sector == "Ocean Economy", year == max(year))
+    max(d$employment)
+  })
+  
+  output$job_val = renderText(total_jobs())
+  
+  total_wages = reactive({
+    d = dplyr::filter(ocean_econ_data(), sector == "Ocean Economy", year == max(year))
+    max(d$wages)
+  })
+  
+  output$wage_val = renderText(label_currency()(total_wages()))
+
+  output$ocean_econ_plot = renderPlotly({
+    suppressWarnings(oame::plot_ocean_economy_i(ocean_econ_data(), y_var = input$oe_var))
+  })
+  
+  ## DMR Card
+  
+  dmrMap_species = reactive({
+    input$dmrMapSpecies
+  }) 
+  dmrMap_varname = reactive({
+    input$dmrMapVariable
+  }) 
+  
+  output$dmr_timeseries = renderPlot({
+    spp = dmrMap_species()
+    varname = dmrMap_varname()
+    suppressWarnings(oame::plot_landings(x = DMR, spp=spp, varname = varname))
     
-    tags$iframe(
-      src = exp_url,
-      width = "100%",
-      height = "600px",
-      frameborder = "0",
-      allowfullscreen = TRUE
-    )
   })
   
-  output$census_plot = renderPlot({
-    oame::plot_census(CENSUS, y_var = input$census_var)
+  ## Map
+  
+  mapdata = reactive({
+    dplyr::filter(LABS, category %in% input$map_filter)
+  })
+  
+  observe({
+    d <- mapdata()
+    proxy <- leafletProxy("research_map") |> clearMarkers()
+    if (nrow(d) == 0) return()
+    
+    entry <- sprintf(
+      '<b><a href="%s" target="_blank">%s</a></b><br>%s',
+      d$website, htmltools::htmlEscape(d$name),
+      htmltools::htmlEscape(d$address)
+    )
+    groups <- split(seq_len(nrow(d)), paste(d$lat, d$long))
+    m <- data.frame(
+      lat   = sapply(groups, function(i) d$lat[i[1]]),
+      long  = sapply(groups, function(i) d$long[i[1]]),
+      type  = sapply(groups, function(i) d$category[i[1]]),
+      popup = sapply(groups, function(i) paste(entry[i], collapse = "<hr>"))
+    )
+    
+    proxy |>
+      addCircleMarkers(
+        lng = m$long, lat = m$lat, popup = m$popup,
+        radius = 7, weight = 1.5, color = "white",
+        fillColor = pal(m$type), fillOpacity = 0.9
+      )
   })
   
   output$research_map = renderLeaflet({
-    oame::map_labs(LABS)
+    oame::map_labs(mapdata())
   })
 }
 
